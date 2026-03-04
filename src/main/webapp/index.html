@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SOAP 1.2 Employee Service</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 700px; margin: 60px auto; color: #333; }
+        h1 { color: #1a5276; }
+        a { color: #2980b9; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-size: 0.95em; }
+        .box { background: #eaf2f8; border-left: 4px solid #2980b9; padding: 14px 18px; margin: 20px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>&#9989; SOAP 1.2 Employee Web Service</h1>
+    <p>The service is deployed and running on <strong>GlassFish 7 Full Platform</strong> with <strong>Jakarta EE 10</strong>.</p>
+
+    <div class="box">
+        <strong>WSDL:</strong><br>
+        <a href="EmployeeService?wsdl">
+            http://localhost:8080/EmployeeService/EmployeeService?wsdl
+        </a>
+    </div>
+
+    <div class="box">
+        <strong>SOAP 1.2 Endpoint:</strong><br>
+        <code>http://localhost:8080/EmployeeService/EmployeeService</code>
+    </div>
+
+    <h2>Available Operations</h2>
+    <ul>
+        <li><code>getEmployee(employeeId)</code> — Retrieve one employee</li>
+        <li><code>getAllEmployees()</code> — List all employees</li>
+        <li><code>createEmployee(employee)</code> — Create a new employee</li>
+        <li><code>updateEmployee(employee)</code> — Update an existing employee</li>
+        <li><code>deleteEmployee(employeeId)</code> — Delete an employee</li>
+    </ul>
+
+    <h2>Test with cURL (SOAP 1.2)</h2>
+    <pre style="background:#1e1e1e;color:#d4d4d4;padding:16px;border-radius:6px;overflow-x:auto;font-size:0.88em;">
+curl -X POST \
+  http://localhost:8080/soap-service/EmployeeService \
+  -H "Content-Type: application/soap+xml;charset=UTF-8" \
+  -d '&lt;soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                    xmlns:ser="http://service.soap.enterprise.com/"&gt;
+    &lt;soap:Body&gt;
+      &lt;ser:getAllEmployees/&gt;
+    &lt;/soap:Body&gt;
+  &lt;/soap:Envelope&gt;'</pre>
+</body>
+</html>

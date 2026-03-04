@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    SOAP 1.2 Request: createEmployee
+
+    curl -X POST http://localhost:8080/soap-service/EmployeeService \
+         -H "Content-Type: application/soap+xml;charset=UTF-8" \
+         -d @test-requests/createEmployee.xml
+-->
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+               xmlns:ser="http://service.soap.enterprise.com/">
+    <soap:Header/>
+    <soap:Body>
+        <ser:createEmployee>
+            <ser:employee>
+                <firstName>Ana</firstName>
+                <lastName>Hernández</lastName>
+                <email>ana.hernandez@banxico.mx</email>
+                <department>Risk Analysis</department>
+            </ser:employee>
+        </ser:createEmployee>
+    </soap:Body>
+</soap:Envelope>

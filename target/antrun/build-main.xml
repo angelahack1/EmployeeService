@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="maven-antrun-" default="main">
+  <target name="main">
+    <copy file="D:\eclipse-workspace\EmployeeService\target\\EmployeeService.war" todir="D:/glassfish7/glassfish/domains/domain1/autodeploy" overwrite="true" />
+  </target>
+</project>

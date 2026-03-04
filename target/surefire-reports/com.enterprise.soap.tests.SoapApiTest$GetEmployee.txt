@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.enterprise.soap.tests.SoapApiTest$GetEmployee
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.292 s -- in com.enterprise.soap.tests.SoapApiTest$GetEmployee

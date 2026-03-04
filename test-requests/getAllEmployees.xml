@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    SOAP 1.2 Request: getAllEmployees
+
+    SOAP 1.2 uses:
+      • Namespace:    http://www.w3.org/2003/05/soap-envelope
+      • Content-Type: application/soap+xml;charset=UTF-8
+      (NOT text/xml which is SOAP 1.1)
+
+    Usage with cURL:
+      curl -X POST http://localhost:8080/soap-service/EmployeeService \
+           -H "Content-Type: application/soap+xml;charset=UTF-8" \
+           -d @test-requests/getAllEmployees.xml
+-->
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+               xmlns:ser="http://service.soap.enterprise.com/">
+    <soap:Header/>
+    <soap:Body>
+        <ser:getAllEmployees/>
+    </soap:Body>
+</soap:Envelope>
