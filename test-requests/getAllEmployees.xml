@@ -8,7 +8,7 @@
       (NOT text/xml which is SOAP 1.1)
 
     Usage with cURL:
-      curl -X POST http://localhost:8080/soap-service/EmployeeService \
+      curl -X POST http://localhost:8080/EmployeeService/EmployeeService \
            -H "Content-Type: application/soap+xml;charset=UTF-8" \
            -d @test-requests/getAllEmployees.xml
 -->

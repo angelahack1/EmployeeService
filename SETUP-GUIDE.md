@@ -1,6 +1,6 @@
 # SOAP 1.2 Web Service — Complete Setup Guide
 
-## Jakarta EE 10 · GlassFish 7 · JDK 17 · Eclipse IDE 2026-03
+## Jakarta EE 10 · GlassFish 7 · JDK 17 · Eclipse IDE
 
 ---
 
@@ -15,7 +15,7 @@
 │  Server:  Eclipse GlassFish 7.x (Jakarta EE 10)                 │
 │  JDK:    17 (LTS)                                                │
 │                                                                  │
-│  soap-service/                                                   │
+│  EmployeeService/                                                │
 │  ├── pom.xml                          ← Maven build config       │
 │  ├── src/main/java/com/enterprise/soap/                          │
 │  │   ├── model/                                                  │
@@ -30,8 +30,16 @@
 │  │   └── WEB-INF/                                                │
 │  │       ├── web.xml                  ← Deployment descriptor    │
 │  │       └── glassfish-web.xml        ← Context root config      │
-│  ├── src/test/java/.../client/                                   │
-│  │   └── SoapClientTest.java          ← Standalone test client   │
+│  ├── src/test/java/com/enterprise/soap/                          │
+│  │   ├── client/                                                 │
+│  │   │   └── SoapClientTest.java      ← Standalone test client   │
+│  │   ├── helpers/                                                │
+│  │   │   ├── PlaywrightBaseTest.java  ← Base test class          │
+│  │   │   ├── SoapEnvelopeBuilder.java ← SOAP request builder    │
+│  │   │   └── SoapResponseParser.java  ← XML response parser     │
+│  │   └── tests/                                                  │
+│  │       ├── SoapApiTest.java         ← 18 SOAP API tests        │
+│  │       └── LandingPageTest.java     ← 11 UI/browser tests      │
 │  └── test-requests/                                              │
 │      ├── getAllEmployees.xml           ← cURL test payloads       │
 │      ├── getEmployee.xml                                         │
@@ -46,7 +54,7 @@
 | Requirement               | Version       | Download URL                                          |
 |--------------------------|---------------|------------------------------------------------------|
 | **JDK**                  | 17 (LTS)      | https://adoptium.net/                                |
-| **Eclipse IDE**          | 2026-03 EE    | https://www.eclipse.org/downloads/                   |
+| **Eclipse IDE**          | Enterprise EE  | https://www.eclipse.org/downloads/                   |
 | **Eclipse GlassFish**    | 7.x           | https://glassfish.org/download                       |
 | **Apache Maven**         | 3.9+          | Bundled with Eclipse (or https://maven.apache.org/)  |
 
@@ -90,9 +98,9 @@
 
 **Option A — From these files (recommended):**
 
-1. Copy the entire `soap-project/` folder to your Eclipse workspace
+1. Copy the entire `EmployeeService/` folder to your Eclipse workspace
 2. In Eclipse: **File → Import → Maven → Existing Maven Projects**
-3. Browse to the `soap-project/` folder → Select `pom.xml` → **Finish**
+3. Browse to the `EmployeeService/` folder → Select `pom.xml` → **Finish**
 4. Eclipse will resolve dependencies automatically
 
 **Option B — Create from scratch:**
@@ -101,8 +109,8 @@
 2. Check **"Create a simple project (skip archetype selection)"**
 3. Fill in:
    - **Group Id:** `com.enterprise`
-   - **Artifact Id:** `soap-service`
-   - **Version:** `1.0.0`
+   - **Artifact Id:** `EmployeeService`
+   - **Version:** `0.1.0`
    - **Packaging:** `war`
 4. Click **Finish**
 5. Replace the generated `pom.xml` with the provided one
@@ -114,7 +122,7 @@
 Your Package Explorer should look like:
 
 ```
-soap-service/
+EmployeeService/
 ├── src/main/java/
 │   └── com.enterprise.soap.model
 │       └── Employee.java
@@ -131,6 +139,17 @@ soap-service/
 ├── src/test/java/
 │   └── com.enterprise.soap.client
 │       └── SoapClientTest.java
+│   └── com.enterprise.soap.helpers
+│       ├── PlaywrightBaseTest.java
+│       ├── SoapEnvelopeBuilder.java
+│       └── SoapResponseParser.java
+│   └── com.enterprise.soap.tests
+│       ├── SoapApiTest.java
+│       └── LandingPageTest.java
+├── test-requests/
+│   ├── getAllEmployees.xml
+│   ├── getEmployee.xml
+│   └── createEmployee.xml
 └── pom.xml
 ```
 
@@ -161,10 +180,18 @@ soap-service/
 4. The console should show:
    ```
    [INFO] BUILD SUCCESS
-   [INFO] Building war: .../target/soap-service.war
+   [INFO] Building war: .../target/EmployeeService.war
    ```
 
-### 3.2  Troubleshoot Build Errors
+### 3.2  Build without Tests
+
+If GlassFish is not running, the automated tests will fail. Use the `no-tests` profile:
+
+```bash
+mvn clean package -Pno-tests
+```
+
+### 3.3  Troubleshoot Build Errors
 
 | Error | Fix |
 |-------|-----|
@@ -179,17 +206,27 @@ soap-service/
 ### 4.1  Deploy from Eclipse
 
 1. In the **Servers** tab → right-click **GlassFish 7** → **Add and Remove...**
-2. Move **soap-service** from Available → Configured → **Finish**
+2. Move **EmployeeService** from Available → Configured → **Finish**
 3. Right-click server → **Publish** (or it publishes automatically)
 4. Server console should show:
    ```
    WS00019: ... EmployeeService ... deployed ... endpoint address:
-   http://localhost:8080/soap-service/EmployeeService
+   http://localhost:8080/EmployeeService/EmployeeService
    ```
 
-### 4.2  Alternative: Deploy WAR Manually
+### 4.2  Deploy with Maven Autodeploy Profile
 
-1. Copy `target/soap-service.war` to `<glassfish>/glassfish/domains/domain1/autodeploy/`
+Configure the GlassFish autodeploy path in `pom.xml` properties, then:
+
+```bash
+mvn clean package -Pdevelopment,autodeploy
+```
+
+This builds the WAR and copies it to the GlassFish autodeploy directory automatically.
+
+### 4.3  Deploy WAR Manually
+
+1. Copy `target/EmployeeService.war` to `<glassfish>/glassfish/domains/domain1/autodeploy/`
 2. GlassFish will auto-deploy within seconds
 3. Check deployment status at **http://localhost:4848** → Applications
 
@@ -202,7 +239,7 @@ soap-service/
 Open your browser and navigate to:
 
 ```
-http://localhost:8080/soap-service/EmployeeService?wsdl
+http://localhost:8080/EmployeeService/EmployeeService?wsdl
 ```
 
 You should see a complete WSDL XML document. **Verify these critical details:**
@@ -216,7 +253,7 @@ You should see a complete WSDL XML document. **Verify these critical details:**
 Navigate to:
 
 ```
-http://localhost:8080/soap-service/
+http://localhost:8080/EmployeeService/
 ```
 
 You should see the HTML landing page with links and instructions.
@@ -230,7 +267,31 @@ You should see the HTML landing page with links and instructions.
 **getAllEmployees:**
 
 ```bash
-curl -X POST http://localhost:8080/soap-service/EmployeeService \
+curl -X POST http://localhost:8080/EmployeeService/EmployeeService \
+  -H "Content-Type: application/soap+xml;charset=UTF-8" \
+  -d @test-requests/getAllEmployees.xml
+```
+
+**getEmployee(1):**
+
+```bash
+curl -X POST http://localhost:8080/EmployeeService/EmployeeService \
+  -H "Content-Type: application/soap+xml;charset=UTF-8" \
+  -d @test-requests/getEmployee.xml
+```
+
+**createEmployee:**
+
+```bash
+curl -X POST http://localhost:8080/EmployeeService/EmployeeService \
+  -H "Content-Type: application/soap+xml;charset=UTF-8" \
+  -d @test-requests/createEmployee.xml
+```
+
+Or construct inline requests:
+
+```bash
+curl -X POST http://localhost:8080/EmployeeService/EmployeeService \
   -H "Content-Type: application/soap+xml;charset=UTF-8" \
   -d '<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                      xmlns:ser="http://service.soap.enterprise.com/">
@@ -240,50 +301,48 @@ curl -X POST http://localhost:8080/soap-service/EmployeeService \
   </soap:Envelope>'
 ```
 
-**getEmployee(1):**
-
 ```bash
-curl -X POST http://localhost:8080/soap-service/EmployeeService \
+curl -X POST http://localhost:8080/EmployeeService/EmployeeService \
   -H "Content-Type: application/soap+xml;charset=UTF-8" \
   -d '<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                      xmlns:ser="http://service.soap.enterprise.com/">
     <soap:Body>
       <ser:getEmployee>
-        <ser:employeeId>1</ser:employeeId>
+        <employeeId>1</employeeId>
       </ser:getEmployee>
     </soap:Body>
   </soap:Envelope>'
 ```
 
-**createEmployee:**
-
 ```bash
-curl -X POST http://localhost:8080/soap-service/EmployeeService \
+curl -X POST http://localhost:8080/EmployeeService/EmployeeService \
   -H "Content-Type: application/soap+xml;charset=UTF-8" \
   -d '<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                      xmlns:ser="http://service.soap.enterprise.com/">
     <soap:Body>
       <ser:createEmployee>
-        <ser:employee>
+        <employee>
           <firstName>Ana</firstName>
           <lastName>Hernández</lastName>
           <email>ana.hernandez@banxico.mx</email>
           <department>Risk Analysis</department>
-        </ser:employee>
+        </employee>
       </ser:createEmployee>
     </soap:Body>
   </soap:Envelope>'
 ```
 
+> **Important — XML namespace convention:** The wrapper elements (`getAllEmployees`, `getEmployee`, `createEmployee`, etc.) use the service namespace prefix (`ser:`), but their **child elements** (`employeeId`, `employee`, `firstName`, etc.) must be **unqualified** (no prefix). This is because the WSDL schema uses `elementFormDefault="unqualified"` (the default). Adding `ser:` to child elements will cause a SOAP fault.
+
 ### 6.2  Test with SoapUI
 
 1. Open SoapUI → **File → New SOAP Project**
-2. Set **Initial WSDL:** `http://localhost:8080/soap-service/EmployeeService?wsdl`
+2. Set **Initial WSDL:** `http://localhost:8080/EmployeeService/EmployeeService?wsdl`
 3. Click **OK** — SoapUI auto-generates requests for all operations
 4. **IMPORTANT:** In each request, ensure the binding is SOAP 1.2:
    - Check that the `Content-Type` header is `application/soap+xml`
    - The envelope namespace should be `http://www.w3.org/2003/05/soap-envelope`
-5. Double-click any operation → click the green ▶ play button to execute
+5. Double-click any operation → click the green play button to execute
 
 ### 6.3  Test with the Java Client
 
@@ -292,9 +351,75 @@ curl -X POST http://localhost:8080/soap-service/EmployeeService \
 3. Right-click → **Run As → Java Application**
 4. The console should show all CRUD operations executing successfully
 
+### 6.4  Automated Test Suite (JUnit 5 + Playwright)
+
+The project includes **29 automated tests** covering SOAP API operations and browser-based UI validation.
+
+> **Requirement:** GlassFish must be running with the service deployed before executing tests.
+
+**Run all tests:**
+
+```bash
+mvn test
+```
+
+**Run by category using Maven profiles:**
+
+```bash
+# SOAP API tests only (CRUD operations, faults, protocol compliance)
+mvn test -Ptesting-api
+
+# UI tests only (landing page content, WSDL endpoint)
+mvn test -Ptesting-ui
+
+# Run with a visible browser window (non-headless)
+mvn test -Ptesting-headed
+```
+
+**Test suite breakdown:**
+
+| Test Class          | Tests | Coverage                                                        |
+|---------------------|-------|-----------------------------------------------------------------|
+| `SoapApiTest`       | 18    | All 5 CRUD operations, SOAP fault handling, protocol compliance |
+| `LandingPageTest`   | 11    | Landing page content/links, WSDL availability and structure     |
+
+**Test helper classes:**
+
+| Class                   | Purpose                                                |
+|-------------------------|--------------------------------------------------------|
+| `PlaywrightBaseTest`    | Manages Playwright browser and API request lifecycle   |
+| `SoapEnvelopeBuilder`   | Fluent builder for SOAP 1.2 request envelopes          |
+| `SoapResponseParser`    | Regex-based XML parser for response fields and faults  |
+
 ---
 
-## STEP 7 — Understanding the Key Design Decisions
+## STEP 7 — Maven Profiles Reference
+
+The `pom.xml` defines several profiles for different workflows:
+
+| Profile          | Usage                                     | Command Example                              |
+|------------------|-------------------------------------------|----------------------------------------------|
+| `development`    | Sets GlassFish autodeploy path (dev)      | `mvn package -Pdevelopment,autodeploy`       |
+| `testing`        | Sets GlassFish autodeploy path (test)     | `mvn package -Ptesting,autodeploy`           |
+| `production`     | Sets GlassFish autodeploy path (prod)     | `mvn package -Pproduction,autodeploy`        |
+| `autodeploy`     | Copies WAR to GlassFish autodeploy dir    | Combine with an environment profile above    |
+| `autoclean`      | Deletes the target directory              | `mvn initialize -Pautoclean`                 |
+| `no-tests`       | Skips all tests during build              | `mvn package -Pno-tests`                     |
+| `testing-api`    | Runs only `SoapApiTest`                   | `mvn test -Ptesting-api`                     |
+| `testing-ui`     | Runs only `LandingPageTest`               | `mvn test -Ptesting-ui`                      |
+| `testing-headed` | Runs tests with visible browser           | `mvn test -Ptesting-headed`                  |
+
+**Configure autodeploy paths** in the `pom.xml` `<properties>` section:
+
+```xml
+<gf_autodeploy_development>D:/glassfish7/glassfish/domains/domain1/autodeploy</gf_autodeploy_development>
+<gf_autodeploy_testing>D:/glassfish7/glassfish/domains/domain1/autodeploy</gf_autodeploy_testing>
+<gf_autodeploy_production>D:/glassfish7-produccion/glassfish/domains/domain1/autodeploy</gf_autodeploy_production>
+```
+
+---
+
+## STEP 8 — Understanding the Key Design Decisions
 
 ### Why SEI + SIB Pattern?
 
@@ -338,6 +463,9 @@ This is the **WS-I Basic Profile** compliant style — the industry standard for
 | **Port conflict on 8080** | Change GlassFish port: Admin Console → Configurations → server-config → Network Config → Network Listeners |
 | **Deployment fails with "Class not found"** | Run `Maven → Update Project` (Alt+F5), then `clean package` again. |
 | **Client gets `MalformedURLException`** | Ensure GlassFish is running and the WSDL URL is accessible in a browser first. |
+| **Tests fail with connection refused** | Start GlassFish and deploy the service before running tests. Playwright tests require a live server. |
+| **SOAP fault: "must not be null"** | Child elements inside operation wrappers must be **unqualified** (no namespace prefix). Use `<employeeId>`, not `<ser:employeeId>`. Only the operation wrapper itself gets the `ser:` prefix. |
+| **Playwright browser not installed** | Run `mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install"` to install browser binaries. |
 
 ---
 
@@ -345,28 +473,29 @@ This is the **WS-I Basic Profile** compliant style — the industry standard for
 
 | Resource                | URL                                                               |
 |------------------------|-------------------------------------------------------------------|
-| **Landing Page**        | http://localhost:8080/soap-service/                              |
-| **WSDL**                | http://localhost:8080/soap-service/EmployeeService?wsdl       |
-| **SOAP Endpoint**       | http://localhost:8080/soap-service/EmployeeService            |
+| **Landing Page**        | http://localhost:8080/EmployeeService/                           |
+| **WSDL**                | http://localhost:8080/EmployeeService/EmployeeService?wsdl       |
+| **SOAP Endpoint**       | http://localhost:8080/EmployeeService/EmployeeService            |
 | **GlassFish Admin**     | http://localhost:4848                                            |
 
 ---
 
-## File Checksums
+## File Reference
 
 | File | Purpose |
 |------|---------|
-| `pom.xml` | Maven build: Jakarta EE 10 provided dependency, WAR packaging, JDK 17 |
+| `pom.xml` | Maven build: Jakarta EE 10 provided dependency, WAR packaging, JDK 17, 9 profiles |
 | `Employee.java` | JAXB-annotated model with `@XmlRootElement`, `@XmlType` |
 | `EmployeeServiceException.java` | `@WebFault` for structured SOAP faults |
 | `EmployeeService.java` | SEI with `@WebService`, `@WebMethod`, `@SOAPBinding` |
-| `EmployeeServiceImpl.java` | SIB with `@BindingType(SOAP12HTTP_BINDING)` ★ |
+| `EmployeeServiceImpl.java` | SIB with `@Stateless` EJB + `@BindingType(SOAP12HTTP_BINDING)` |
 | `web.xml` | Jakarta EE 10 (version 6.0) deployment descriptor |
-| `glassfish-web.xml` | Sets context root to `/soap-service` |
+| `glassfish-web.xml` | Sets context root to `/EmployeeService` |
 | `index.html` | Human-friendly landing page |
-| `SoapClientTest.java` | Standalone Java client for integration testing |
+| `SoapClientTest.java` | Standalone Java client for manual integration testing |
+| `PlaywrightBaseTest.java` | Base test class managing Playwright lifecycle |
+| `SoapEnvelopeBuilder.java` | Fluent builder for SOAP 1.2 request XML |
+| `SoapResponseParser.java` | Regex-based SOAP response field extractor |
+| `SoapApiTest.java` | 18 automated SOAP API tests (CRUD + protocol) |
+| `LandingPageTest.java` | 11 automated browser tests (landing page + WSDL) |
 | `test-requests/*.xml` | Ready-to-use cURL payloads |
-
----
-
-*Template version 1.0.0 — Tested with Eclipse GlassFish 7.0.x, JDK 17, Eclipse IDE 2024-12+*

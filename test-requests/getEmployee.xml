@@ -2,7 +2,7 @@
 <!--
     SOAP 1.2 Request: getEmployee(1)
 
-    curl -X POST http://localhost:8080/soap-service/EmployeeService \
+    curl -X POST http://localhost:8080/EmployeeService/EmployeeService \
          -H "Content-Type: application/soap+xml;charset=UTF-8" \
          -d @test-requests/getEmployee.xml
 -->
@@ -11,7 +11,7 @@
     <soap:Header/>
     <soap:Body>
         <ser:getEmployee>
-            <ser:employeeId>1</ser:employeeId>
+            <employeeId>1</employeeId>
         </ser:getEmployee>
     </soap:Body>
 </soap:Envelope>

@@ -2,7 +2,7 @@
 <!--
     SOAP 1.2 Request: createEmployee
 
-    curl -X POST http://localhost:8080/soap-service/EmployeeService \
+    curl -X POST http://localhost:8080/EmployeeService/EmployeeService \
          -H "Content-Type: application/soap+xml;charset=UTF-8" \
          -d @test-requests/createEmployee.xml
 -->
@@ -11,12 +11,12 @@
     <soap:Header/>
     <soap:Body>
         <ser:createEmployee>
-            <ser:employee>
+            <employee>
                 <firstName>Ana</firstName>
                 <lastName>Hernández</lastName>
                 <email>ana.hernandez@banxico.mx</email>
                 <department>Risk Analysis</department>
-            </ser:employee>
+            </employee>
         </ser:createEmployee>
     </soap:Body>
 </soap:Envelope>
